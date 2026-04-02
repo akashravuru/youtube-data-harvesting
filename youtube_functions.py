@@ -1,27 +1,40 @@
 # Imports
+
 import os
+import streamlit as st
 import pandas as pd
-from dotenv import load_dotenv
 from googleapiclient.discovery import build
 import mysql.connector as mc
 
-# Load environment variables
-load_dotenv()
+# Load secrets - works both locally and on Streamlit Cloud
+try:
+    api_key = st.secrets["API_KEY"]
+    host = st.secrets["HOST"]
+    db_user = st.secrets["DB_USER"]
+    password = st.secrets["PASSWORD"]
+    database = st.secrets["DATABASE"]
+    port = int(st.secrets["PORT"])
+except:
+    from dotenv import load_dotenv
+    load_dotenv()
+    api_key = os.getenv("API_KEY")
+    host = os.getenv("HOST")
+    db_user = os.getenv("DB_USER")
+    password = os.getenv("PASSWORD")
+    database = os.getenv("DATABASE")
+    port = int(os.getenv("PORT"))
 
-# YouTube API
-api_key = os.getenv("API_KEY")
 connection = build('youtube', 'v3', developerKey=api_key)
 
-# MySQL connection
 mydb = mc.connect(
-    host=os.getenv("HOST"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("PASSWORD"),
-    database=os.getenv("DATABASE")
+    host=host,
+    user=db_user,
+    password=password,
+    database=database,
+    port=port
 )
 
 cursor = mydb.cursor(buffered=True)
-
 ##FETCHING DETAILS
 # ------------------ CHANNEL ------------------
 def fetch_channel_info(channel_id):
@@ -214,3 +227,11 @@ def convert_duration(duration):
     minutes = int(match.group(2) or 0)
     seconds = int(match.group(3) or 0)
     return hours * 3600 + minutes * 60 + seconds
+
+
+# Export cursor and connection
+def get_cursor():
+    return cursor
+
+def get_connection():
+    return mydb

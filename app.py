@@ -2,6 +2,9 @@ from youtube_functions import *
 import streamlit as st
 import pandas as pd
 
+cursor = get_cursor()
+mydb = get_connection()
+
 page = st.sidebar.radio("Navigation", ["Channel Details", "Videos", "Analytics"])
 
 
