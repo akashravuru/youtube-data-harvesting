@@ -4,7 +4,7 @@ import os
 import streamlit as st
 import pandas as pd
 from googleapiclient.discovery import build
-import mysql.connector as mc
+import sqlite3
 
 # Load secrets - works both locally and on Streamlit Cloud
 try:
@@ -26,15 +26,12 @@ except:
 
 connection = build('youtube', 'v3', developerKey=api_key)
 
-mydb = mc.connect(
-    host=host,
-    user=db_user,
-    password=password,
-    database=database,
-    port=port
+mydb = sqlite3.connect(
+    "youtube_data.db",
+    check_same_thread=False
 )
 
-cursor = mydb.cursor(buffered=True)
+cursor = mydb.cursor()
 ##FETCHING DETAILS
 # ------------------ CHANNEL ------------------
 def fetch_channel_info(channel_id):

@@ -46,7 +46,7 @@ if page == "Channel Details":
             if channel[1] == selected_title:
                 selected_id = channel[0]
                 
-        cursor.execute("SELECT * FROM channels WHERE channel_ID = %s", (selected_id,))
+        cursor.execute("SELECT * FROM channels WHERE channel_ID = ?", (selected_id,))
         channel_data = cursor.fetchone()
         st.subheader(channel_data[1])
         st.caption(channel_data[2]) 
@@ -82,12 +82,12 @@ elif page == "Videos":
         cursor.execute("""
         SELECT title, description, view_count, likes, comment_count, published_at
         FROM videos
-        WHERE channel_ID = %s
+        WHERE channel_ID = ?
         """, (selected_id,))
 
         videos = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM channels WHERE channel_ID = %s", (selected_id,))
+        cursor.execute("SELECT * FROM channels WHERE channel_ID = ?", (selected_id,))
         channel_data = cursor.fetchone()
         st.subheader(channel_data[1])
         st.caption(channel_data[2]) 
@@ -225,7 +225,7 @@ elif page == "Analytics":
         SELECT DISTINCT channels.title
         FROM videos
         JOIN channels ON videos.channel_ID = channels.channel_ID
-        WHERE YEAR(videos.published_at) = 2022
+        WHERE strftime('%Y', videos.published_at) = '2022'
         """)
         results = cursor.fetchall()
         df = pd.DataFrame(results, columns=["Channel Name"])

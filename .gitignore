@@ -2,4 +2,3 @@ __pycache__/
 *.pyc
 .env
 youtube_data.sql
-youtube_data.db
