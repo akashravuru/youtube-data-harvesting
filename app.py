@@ -1,6 +1,16 @@
 from youtube_functions import *
 import streamlit as st
 import pandas as pd
+import os
+
+from dotenv import load_dotenv
+from google import genai
+
+load_dotenv()
+
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
 cursor = get_cursor()
 mydb = get_connection()
@@ -143,7 +153,49 @@ elif page == "Analytics":
         results = cursor.fetchall()
         df = pd.DataFrame(results, columns=["Video Title", "Channel Name", "Views"])
         st.dataframe(df)
+        if st.button("Generate AI Insights"):
 
+            top_videos_text = df.to_string(index=False)
+
+            prompt = f"""
+                You are a YouTube analytics expert.
+
+                Analyze the following top-performing videos.
+
+                Return your answer EXACTLY in this format:
+
+                KEY_INSIGHT:
+                <one paragraph>
+
+                CONTENT_PATTERN:
+                <one paragraph>
+
+                RECOMMENDATION:
+                <one paragraph>
+
+                Rules:
+                - Only use information present in the data.
+                - Do not assume audience demographics.
+                - Do not invent metrics.
+                - If information is missing, say so.
+
+                Data:
+
+                {top_videos_text}
+                """
+
+            try:
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt
+                )
+
+                st.write(response.text)
+
+            except Exception as e:
+                st.error(
+                    "AI service is temporarily unavailable. Please try again in a few moments."
+                )
 #Question "4. Comment count per video"
     if query_choice == "4. Comment count per video":
         cursor.execute("""
