@@ -1,100 +1,164 @@
 # AI Creator Intelligence Platform
 
-An AI-powered YouTube analytics platform that collects channel data using the YouTube Data API, stores it in MySQL, performs advanced analytics, and generates AI-driven content insights using Google's Gemini models.
+An AI-powered analytics platform that transforms raw YouTube channel data into actionable creator insights using SQL analytics, large language models, and interactive visualizations.
 
-🔗 **Live App:** https://youtube-data-harvesting-lhwgzjqpygjae44mgrbhd6.streamlit.app/
+### Live Application
+
+🚀 Live Demo: https://youtube-data-harvesting-lhwgzjqpygjae44mgrbhd6.streamlit.app/
+
+### GitHub Repository
+
+💻 GitHub: https://github.com/akashravuru/youtube-data-harvesting
 
 ---
 
 ## Overview
 
-Creators have access to massive amounts of performance data, but extracting actionable insights from that data is time-consuming.
+Most creator dashboards show data.
 
-This project transforms raw YouTube analytics into AI-generated recommendations by combining:
+This platform explains the data.
 
-* YouTube Data API
-* MySQL Data Warehousing
-* SQL Analytics
-* Gemini LLM Integration
-* Streamlit Dashboard
+The AI Creator Intelligence Platform combines YouTube Analytics, SQL-based performance analysis, and Google's Gemini models to identify content patterns, winning formats, channel performance trends, and growth opportunities.
 
-The platform enables creators to analyze channel performance, identify content patterns, and receive AI-powered recommendations based on real video performance data.
+The system ingests channel-level data from YouTube, stores it in a structured analytics database, performs SQL-powered reporting, and generates AI-driven content intelligence from real creator performance metrics.
 
 ---
 
-## Key Features
+## What Makes This Different?
 
-### Data Collection & Warehousing
+Instead of simply displaying analytics, the platform acts like an AI Content Strategist.
 
-* Fetch channel metadata using YouTube Data API v3
-* Store channels, videos, and comments in MySQL
-* Maintain a structured analytics database for querying and reporting
+It can:
 
-### Analytics Dashboard
-
-* Channel performance overview
-* Video-level analytics
-* Subscriber, views, likes, and engagement metrics
-* 10 SQL-powered analytical reports
-
-### AI Creator Insights
-
-Generate AI-powered analysis for top-performing videos:
-
-* Key performance insights
-* Content pattern detection
-* Topic and format analysis
-* Growth recommendations
-* Cross-channel content comparisons
-
-The AI analyzes real channel data and identifies recurring themes, content formats, and audience engagement patterns.
+* Identify recurring content patterns among top-performing videos
+* Analyze creator performance across multiple channels
+* Surface winning content formats
+* Compare channel performance
+* Generate AI-powered recommendations based on actual performance data
+* Convert analytics into creator-friendly insights
 
 ---
 
-## Tech Stack
+## Features
 
-| Layer           | Technology                                   |
-| --------------- | -------------------------------------------- |
-| Frontend        | Streamlit                                    |
-| Backend         | Python                                       |
-| Database        | MySQL                                        |
-| Data Processing | Pandas                                       |
-| APIs            | YouTube Data API v3                          |
-| AI Layer        | Gemini 2.5 Flash                             |
-| Libraries       | google-genai, mysql-connector-python, pandas |
+### YouTube Data Collection
+
+* Fetch channel information using YouTube Data API v3
+* Collect video metadata
+* Collect comment data
+* Build a structured creator dataset
+
+### Analytics Engine
+
+* SQL-powered analytical reports
+* Cross-channel analysis
+* Performance benchmarking
+* Video-level metrics
+* Channel-level metrics
+
+### AI Creator Intelligence
+
+Generate AI-powered reports including:
+
+* Key Insights
+* Content Pattern Detection
+* Winning Content Formats
+* Channel Performance Analysis
+* Growth Opportunities
+* Content Recommendations
 
 ---
 
-## AI Workflow
+## Dataset
+
+The platform currently analyzes:
+
+* 6 YouTube Channels
+* 930+ Videos
+* 204,000+ Comments
+
+---
+
+## Technology Stack
+
+| Layer           | Technology          |
+| --------------- | ------------------- |
+| Frontend        | Streamlit           |
+| Backend         | Python              |
+| Database        | SQLite              |
+| Data Processing | Pandas              |
+| API Integration | YouTube Data API v3 |
+| AI Layer        | Gemini 2.5 Flash    |
+| Analytics       | SQL                 |
+| Deployment      | Streamlit Cloud     |
+
+---
+
+## System Architecture
 
 ```text
-YouTube API
-     ↓
-MySQL Database
-     ↓
-SQL Analytics
-     ↓
-Pandas DataFrames
-     ↓
-Gemini AI
-     ↓
-Content Insights & Recommendations
+YouTube Data API
+        ↓
+Data Collection Layer
+        ↓
+SQLite Analytics Database
+        ↓
+SQL Analytics Engine
+        ↓
+Pandas Data Processing
+        ↓
+Gemini AI Analysis
+        ↓
+Creator Intelligence Dashboard
 ```
 
 ---
 
-## Analytics Queries
+## Analytics Modules
 
-1. Videos and their channels
-2. Channels with the most videos
-3. Top 10 most viewed videos
-4. Comment count per video
-5. Videos with the most likes
-6. Total likes per video
-7. Total views per channel
-8. Channels publishing videos in 2022
-9. Video duration analysis
-10. Videos with the most comments
+### Channel Intelligence
+
+* Subscriber Analysis
+* View Analysis
+* Video Volume Analysis
+* Channel Overview
+
+### Video Intelligence
+
+* Video Performance Metrics
+* Engagement Analysis
+* Likes & Comments Analysis
+* Publishing Information
+
+### SQL Analytics
+
+1. Videos and their Channels
+2. Channels with the Most Videos
+3. Top 10 Most Viewed Videos
+4. Comment Count per Video
+5. Most Liked Videos
+6. Total Likes per Video
+7. Total Views per Channel
+8. Channels Publishing in 2022
+9. Video Duration Analysis
+10. Most Commented Videos
+
+### AI Creator Intelligence
+
+The AI layer analyzes:
+
+* Top Viewed Videos
+* Top Liked Videos
+* Top Performing Channels
+
+and generates:
+
+* Key Insights
+* Content Patterns
+* Winning Formats
+* Channel Performance Analysis
+* Growth Opportunities
+* Strategic Recommendations
 
 ---
 
@@ -102,23 +166,25 @@ Content Insights & Recommendations
 
 ```text
 youtube-data-harvesting/
+│
 ├── app.py
 ├── youtube_functions.py
 ├── notebook.ipynb
 ├── requirements.txt
-├── .env
-├── .gitignore
-└── README.md
+├── youtube_data.db
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-## Local Setup
+## Local Installation
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/akashravuru/youtube-data-harvesting
+git clone https://github.com/akashravuru/youtube-data-harvesting.git
+
 cd youtube-data-harvesting
 ```
 
@@ -131,14 +197,8 @@ pip install -r requirements.txt
 ### Configure Environment Variables
 
 ```env
-API_KEY=your_youtube_api_key
-GEMINI_API_KEY=your_gemini_api_key
-
-HOST=localhost
-DB_USER=root
-PASSWORD=your_mysql_password
-DATABASE=youtube_data
-PORT=3306
+API_KEY=YOUR_YOUTUBE_API_KEY
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```
 
 ### Run Application
@@ -149,47 +209,33 @@ streamlit run app.py
 
 ---
 
-## Database Schema
+## Future Enhancements
 
-### channels
-
-* channel_ID
-* title
-* description
-* subscriber_count
-* view_count
-* video_count
-* playlist_id
-
-### videos
-
-* video_ID
-* channel_ID
-* title
-* description
-* likes
-* view_count
-* comment_count
-* duration
-* published_at
-
-### comments
-
-* comment_ID
-* video_ID
-* comment_text
+* Multi-channel benchmarking
+* AI-generated content strategy reports
+* Trend prediction models
+* Thumbnail intelligence
+* Title optimization recommendations
+* Retrieval-Augmented Creator Knowledge Base
+* Agentic Creator Copilot
 
 ---
 
-## Future Improvements
+## Skills Demonstrated
 
-* Structured AI outputs
-* AI insights for all analytics modules
-* Channel benchmarking
-* Trend prediction
-* Multi-model support
-* Creator growth score
+* Python Development
+* SQL Analytics
+* Data Engineering
+* API Integration
+* LLM Application Development
+* Prompt Engineering
+* Streamlit Application Development
+* Data Modeling
+* AI Product Development
+* End-to-End Deployment
 
 ---
 
 Built by Akash Ravuru
+
+AI Engineer • Data Analytics • Applied AI Systems
