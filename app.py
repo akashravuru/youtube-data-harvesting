@@ -15,7 +15,15 @@ client = genai.Client(
 cursor = get_cursor()
 mydb = get_connection()
 
-page = st.sidebar.radio("Navigation", ["Channel Details", "Videos", "Analytics"])
+page = st.sidebar.radio(
+    "Navigation",
+    [
+        "Channel Details",
+        "Videos",
+        "Analytics",
+        "AI Creator Intelligence"
+    ]
+    )
 
 
 if page == "Channel Details":
@@ -141,7 +149,7 @@ elif page == "Analytics":
         results = cursor.fetchall()
         df = pd.DataFrame(results, columns=["Video Title", "Channel Name"])
         st.dataframe(df)
-#Question 3
+# Question 3
     if query_choice == "3. Top 10 most viewed videos":
         cursor.execute("""
         SELECT videos.title, channels.title, videos.view_count
@@ -150,52 +158,16 @@ elif page == "Analytics":
         ORDER BY videos.view_count DESC
         LIMIT 10
         """)
+
         results = cursor.fetchall()
-        df = pd.DataFrame(results, columns=["Video Title", "Channel Name", "Views"])
+
+        df = pd.DataFrame(
+            results,
+            columns=["Video Title", "Channel Name", "Views"]
+        )
+
+        st.subheader("📈 Top 10 Most Viewed Videos")
         st.dataframe(df)
-        if st.button("Generate AI Insights"):
-
-            top_videos_text = df.to_string(index=False)
-
-            prompt = f"""
-                You are a YouTube analytics expert.
-
-                Analyze the following top-performing videos.
-
-                Return your answer EXACTLY in this format:
-
-                KEY_INSIGHT:
-                <one paragraph>
-
-                CONTENT_PATTERN:
-                <one paragraph>
-
-                RECOMMENDATION:
-                <one paragraph>
-
-                Rules:
-                - Only use information present in the data.
-                - Do not assume audience demographics.
-                - Do not invent metrics.
-                - If information is missing, say so.
-
-                Data:
-
-                {top_videos_text}
-                """
-
-            try:
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt
-                )
-
-                st.write(response.text)
-
-            except Exception as e:
-                st.error(
-                    "AI service is temporarily unavailable. Please try again in a few moments."
-                )
 #Question "4. Comment count per video"
     if query_choice == "4. Comment count per video":
         cursor.execute("""
@@ -287,3 +259,152 @@ elif page == "Analytics":
         results = cursor.fetchall()
         df = pd.DataFrame(results, columns=["Video Name","Channel Name", "Comment"])
         st.dataframe(df)
+
+elif page == "AI Creator Intelligence":
+
+    st.title("🤖 AI Creator Intelligence")
+
+    # TOP VIEWED VIDEOS
+    cursor.execute("""
+    SELECT videos.title, channels.title, videos.view_count
+    FROM videos
+    JOIN channels ON videos.channel_ID = channels.channel_ID
+    ORDER BY videos.view_count DESC
+    LIMIT 10
+    """)
+
+    top_views = cursor.fetchall()
+
+    df_views = pd.DataFrame(
+        top_views,
+        columns=["Video Title", "Channel Name", "Views"]
+    )
+
+    st.subheader("📈 Top Viewed Videos")
+    st.dataframe(df_views)
+
+    # TOP LIKED VIDEOS
+    cursor.execute("""
+    SELECT videos.title, channels.title, videos.likes
+    FROM videos
+    JOIN channels ON videos.channel_ID = channels.channel_ID
+    ORDER BY videos.likes DESC
+    LIMIT 10
+    """)
+
+    top_likes = cursor.fetchall()
+
+    df_likes = pd.DataFrame(
+        top_likes,
+        columns=["Video Title", "Channel Name", "Likes"]
+    )
+
+    st.subheader("❤️ Top Liked Videos")
+    st.dataframe(df_likes)
+
+    st.divider()
+
+    # TOP CHANNELS BY VIEWS
+
+    cursor.execute("""
+    SELECT title, view_count
+    FROM channels
+    ORDER BY view_count DESC
+    LIMIT 10
+    """)
+
+    top_channels = cursor.fetchall()
+
+    df_channels = pd.DataFrame(
+        top_channels,
+        columns=["Channel Name", "Views"]
+    )
+
+    st.subheader("📺 Top Channels By Views")
+    st.dataframe(df_channels)
+
+    if st.button("Generate Content Intelligence"):
+
+        views_text = df_views.to_string(index=False)
+        likes_text = df_likes.to_string(index=False)
+        channels_text = df_channels.to_string(index=False)
+
+        prompt = f"""
+        You are a YouTube analytics expert.
+
+        Analyze the following YouTube performance data.
+
+        TOP VIEWED VIDEOS:
+        {views_text}
+
+        TOP LIKED VIDEOS:
+        {likes_text}
+
+        TOP CHANNELS:
+        {channels_text}
+
+        Provide a detailed analysis with the following sections:
+
+        1. KEY INSIGHT
+        - What is the single most important takeaway from the data?
+
+        2. CONTENT PATTERNS
+        - What recurring themes, formats, topics, title styles, or content categories appear among the top-performing videos?
+
+        3. WINNING FORMATS
+        - Which content formats appear to perform best?
+        - Examples: shorts, comparisons, reviews, tutorials, podcasts, educational content, lists, etc.
+        - Only use formats that are evident from the provided data.
+
+        4. CHANNEL PERFORMANCE ANALYSIS
+        - Which channels dominate the dataset?
+        - Which channels contribute most of the top-performing content?
+        - Are there noticeable differences in performance between channels?
+
+        5. GROWTH OPPORTUNITIES
+        - Based only on the available data, what opportunities exist for creators to increase performance?
+        - If information is missing, explicitly state the limitation.
+
+        6. RECOMMENDATIONS
+        - Provide practical content recommendations supported by the data.
+        - Do not recommend strategies that are not supported by the provided information.
+
+        IMPORTANT RULES:
+        - Only use information present in the data.
+        - Do not assume audience demographics.
+        - Do not invent metrics.
+        - Do not speculate about watch time, CTR, retention, revenue, or audience behavior unless directly supported by the data.
+        - If information is missing, clearly say so.
+        - Support observations with examples from the supplied data whenever possible.
+
+        Format your response using clear headings:
+
+        KEY INSIGHT
+
+        CONTENT PATTERNS
+
+        WINNING FORMATS
+
+        CHANNEL PERFORMANCE ANALYSIS
+
+        GROWTH OPPORTUNITIES
+
+        RECOMMENDATIONS
+        """
+
+        try:
+
+            with st.spinner("Analyzing channel performance..."):
+
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt
+                )
+
+            st.subheader("🤖 AI Content Intelligence")
+            st.write(response.text)
+
+        except Exception:
+            st.error(
+                "AI service is temporarily unavailable. Please try again in a few moments."
+            )
