@@ -6,6 +6,12 @@ import os
 from dotenv import load_dotenv
 from google import genai
 
+st.set_page_config(
+    page_title="AI Creator Intelligence Platform",
+    page_icon="🎬",
+    layout="wide"
+)
+
 load_dotenv()
 
 client = genai.Client(
@@ -15,19 +21,29 @@ client = genai.Client(
 cursor = get_cursor()
 mydb = get_connection()
 
+
+st.sidebar.title("🎬 AI Creator Intelligence")
+
+st.sidebar.markdown("""
+Analyze YouTube channels, discover content patterns,
+and get AI-powered recommendations.
+""")
+
 page = st.sidebar.radio(
     "Navigation",
     [
-        "Channel Details",
-        "Videos",
-        "Analytics",
-        "AI Creator Intelligence"
+        "📊 Channel Explorer",
+        "🎥 Video Explorer",
+        "📈 Analytics Dashboard",
+        "🤖 AI Creator Intelligence",
+        "🧠 AI Creator Copilot"
     ]
-    )
+)
 
 
-if page == "Channel Details":
-    st.write("Channel Details Page")
+if page == "📊 Channel Explorer":
+    st.title("📊 Channel Explorer")
+    st.caption("Analyze subscribers, views, and channel growth metrics.")
     channel_id = st.text_input("Enter YouTube Channel ID")
     if st.button("Fetch & Store Channel"):
         if channel_id:
@@ -57,8 +73,9 @@ if page == "Channel Details":
 
 
     
-elif page == "Videos":
-    st.write("Video Details Page")
+elif page == "🎥 Video Explorer":
+    st.title("🎥 Video Explorer")
+    st.caption("Explore video-level performance and engagement metrics.")
 
     channel_id = st.text_input("Enter YouTube Channel ID")
 
@@ -113,8 +130,9 @@ elif page == "Videos":
 
            
     
-elif page == "Analytics":
-    st.title("Analytics")
+elif page == "📈 Analytics Dashboard":
+    st.title("📈 Analytics Dashboard")
+    st.caption("SQL-powered analytics across channels, videos, views, likes, and comments.")
     
     query_choice = st.selectbox("Select a Query", [
         "1. Videos and their channels",
@@ -260,11 +278,31 @@ elif page == "Analytics":
         df = pd.DataFrame(results, columns=["Video Name","Channel Name", "Comment"])
         st.dataframe(df)
 
-elif page == "AI Creator Intelligence":
+elif page == "🤖 AI Creator Intelligence":
 
     st.title("🤖 AI Creator Intelligence")
+    st.caption(
+        "AI-powered analysis of top-performing channels, videos, and content patterns."
+    )
 
     # TOP VIEWED VIDEOS
+    cursor.execute("SELECT COUNT(*) FROM channels")
+    channel_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM videos")
+    video_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM comments")
+    comment_count = cursor.fetchone()[0]
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Channels", channel_count)
+    col2.metric("Videos", video_count)
+    col3.metric("Comments", comment_count)
+
+    st.divider()
+    
     cursor.execute("""
     SELECT videos.title, channels.title, videos.view_count
     FROM videos
@@ -407,4 +445,113 @@ elif page == "AI Creator Intelligence":
         except Exception:
             st.error(
                 "AI service is temporarily unavailable. Please try again in a few moments."
+            )
+
+elif page == "🧠 AI Creator Copilot":
+
+    st.title("🧠 AI Creator Copilot")
+
+    st.caption(
+        "Ask natural-language questions about your YouTube dataset."
+    )
+
+    cursor.execute("SELECT COUNT(*) FROM channels")
+    channel_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM videos")
+    video_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM comments")
+    comment_count = cursor.fetchone()[0]
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Channels", channel_count)
+    col2.metric("Videos", video_count)
+    col3.metric("Comments", comment_count)
+    
+    st.divider()
+
+
+    st.markdown("""
+    ### Example Questions
+
+    - What content performs best?
+    - Which channel has the highest engagement?
+    - Give me 10 video ideas based on top performers.
+    - What patterns appear in the most viewed videos?
+    - Which videos should be recreated?
+    - Summarize the dataset.
+    """)
+
+    user_question = st.text_area(
+        "Ask a question about the dataset",
+        placeholder="Example: What content performs best and why?"
+    )
+
+    if st.button("🚀 Ask Copilot"):
+
+        cursor.execute("""
+        SELECT videos.title,
+               channels.title,
+               videos.view_count,
+               videos.likes,
+               videos.comment_count
+        FROM videos
+        JOIN channels
+        ON videos.channel_ID = channels.channel_ID
+        ORDER BY videos.view_count DESC
+        LIMIT 50
+        """)
+
+        data = cursor.fetchall()
+
+        context = pd.DataFrame(
+            data,
+            columns=[
+                "Video",
+                "Channel",
+                "Views",
+                "Likes",
+                "Comments"
+            ]
+        ).to_string(index=False)
+
+        prompt = f"""
+        You are an AI Creator Strategist and YouTube Growth Consultant.
+
+        Dataset:
+
+        {context}
+
+        User Question:
+
+        {user_question}
+
+        Rules:
+
+        - Use only the supplied dataset.
+        - Do not invent metrics.
+        - If information is unavailable, say so.
+        - Support conclusions using examples from the data.
+        """
+
+        try:
+
+            with st.spinner("🧠 Analyzing dataset..."):
+
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt
+                )
+
+            st.success("AI Analysis Complete")
+            st.subheader("🎯 Creator Copilot Response")
+
+            st.write(response.text)
+
+        except Exception:
+
+            st.error(
+                "AI service is temporarily unavailable."
             )
